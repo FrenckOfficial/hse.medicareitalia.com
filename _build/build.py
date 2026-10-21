@@ -1572,8 +1572,10 @@ def not_found():
 def prepare_out():
     """File di servizio per la pubblicazione (GitHub Pages)."""
     open(os.path.join(OUT, ".nojekyll"), "w").close()
-    with open(os.path.join(OUT, "CNAME"), "w") as f:
-        f.write(ORIGIN.split("//")[1] + "\n")
+    # il dominio si imposta su GitHub (Settings → Pages); il file CNAME, se c'è, non viene toccato
+    if not os.path.exists(os.path.join(OUT, "CNAME")):
+        with open(os.path.join(OUT, "CNAME"), "w") as f:
+            f.write(ORIGIN.split("//")[1] + "\n")
 
 
 def clean_stale():

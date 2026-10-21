@@ -6,7 +6,7 @@
 backend:
   name: github
   repo: FrenckOfficial/hse.medicareitalia.com
-  branch: main
+  branch: master
   commit_messages:
     create: "Admin: nuovo {{collection}} «{{slug}}»"
     update: "Admin: aggiornato {{collection}} «{{slug}}»"

@@ -6,7 +6,7 @@ name: Pubblica sito
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   schedule:
     - cron: "0 3 * * *"
   workflow_dispatch:
