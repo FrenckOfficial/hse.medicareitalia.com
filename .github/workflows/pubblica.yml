@@ -1,0 +1,49 @@
+# Rigenera e pubblica il sito su GitHub Pages:
+# - a ogni salvataggio dall'area admin (push su main)
+# - ogni notte, così le edizioni dei corsi concluse spariscono dal calendario
+# - a mano, da Actions → "Pubblica sito" → Run workflow
+name: Pubblica sito
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python _build/build.py
+        env:
+          TZ: Europe/Rome
+      # pubblica la cartella principale senza i file di lavoro
+      - run: rsync -a --exclude='.git*' --exclude='.claude' --exclude='_build' --exclude='content' --exclude='README.md' --exclude='requirements.txt' ./ _site/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

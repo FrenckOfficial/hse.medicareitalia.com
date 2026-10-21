@@ -1,0 +1,222 @@
+# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms@0.230.0/schema/sveltia-cms.json
+#
+# Area admin di Medicare Italia (Sveltia CMS).
+# Ogni salvataggio crea un commit nel repository GitHub; GitHub Actions rigenera e pubblica il sito.
+
+backend:
+  name: github
+  repo: FrenckOfficial/hse.medicareitalia.com
+  branch: main
+  commit_messages:
+    create: "Admin: nuovo {{collection}} «{{slug}}»"
+    update: "Admin: aggiornato {{collection}} «{{slug}}»"
+    delete: "Admin: eliminato {{collection}} «{{slug}}»"
+    uploadMedia: "Admin: caricato {{path}}"
+    deleteMedia: "Admin: eliminato {{path}}"
+
+site_url: https://hse-medicare.friuliemergenze.it
+display_url: https://hse-medicare.friuliemergenze.it
+logo:
+  src: /assets/img/logo-mark.webp
+
+media_folder: assets/uploads
+public_folder: /assets/uploads
+
+slug:
+  encoding: ascii
+  clean_accents: true
+
+collections:
+  # ------------------------------------------------------------------ corsi
+  - name: corsi
+    label: Corsi
+    label_singular: Corso
+    description: >-
+      Calendario e catalogo dei corsi. Per una nuova edizione dello stesso corso usa «Duplica».
+      Le edizioni con l'ultima giornata già passata spariscono da calendario e categorie in automatico
+      (la loro pagina resta, segnata come conclusa). Metti i posti a 0 per chiudere le iscrizioni.
+    folder: content/corsi
+    extension: json
+    format: json
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    identifier_field: title
+    summary: "{{title}}"
+    sortable_fields: [title]
+    view_filters:
+      - { label: In presenza, field: mode, pattern: presenza }
+      - { label: Videoconferenza, field: mode, pattern: videoconferenza }
+      - { label: E-learning, field: mode, pattern: elearning }
+      - { label: Non pubblicati, field: published, pattern: false }
+    editor:
+      preview: false
+    fields:
+      - { label: Titolo, name: title, widget: string, hint: "Es. Primo Soccorso – Gruppo A (16 ore). Il titolo determina anche l'indirizzo della pagina." }
+      - { label: Pubblicato, name: published, widget: boolean, default: true, hint: "Disattiva per nascondere il corso dal sito senza eliminarlo." }
+      - label: Categorie
+        name: categories
+        widget: select
+        multiple: true
+        min: 1
+        options:
+          - { label: Primo Soccorso, value: primo-soccorso }
+          - { label: Antincendio, value: antincendio }
+          - { label: Sicurezza sul lavoro, value: sicurezza-sul-lavoro }
+          - { label: Aggiornamento professionale, value: aggiornamento-professionale }
+          - { label: Corsi e-learning, value: corsi-elearning }
+          - { label: Corsi BLSD, value: corsi-blsd }
+          - { label: HACCP, value: haccp }
+      - label: Modalità
+        name: mode
+        widget: select
+        default: presenza
+        options:
+          - { label: In presenza, value: presenza }
+          - { label: Videoconferenza sincrona, value: videoconferenza }
+          - { label: E-learning, value: elearning }
+      - { label: "Prezzo (€, IVA inclusa)", name: price, widget: number, value_type: float, min: 0, step: 0.01 }
+      - { label: Posti disponibili, name: seats, widget: number, value_type: int, min: 0, required: false, hint: "Lascia vuoto per i corsi e-learning. 0 = esaurito." }
+      - label: Giornate
+        name: days
+        widget: list
+        required: false
+        allow_reorder: true
+        summary: "{{date}} – {{time}}"
+        hint: "Lascia vuoto per i corsi e-learning senza date."
+        fields:
+          - { label: Data, name: date, widget: datetime, time_format: false, date_format: "DD/MM/YYYY", format: "YYYY-MM-DD" }
+          - { label: Orario, name: time, widget: string, required: false, hint: "Es. dalle 08:30 alle 16:30" }
+      - { label: Nota sul calendario, name: note, widget: string, required: false, hint: "Es. Leggi la descrizione per visualizzare il calendario del corso" }
+      - { label: Indirizzo, name: place, widget: string, required: false, hint: "Solo per i corsi in presenza. Es. Viale Argine dei Moreri, 8, 34073 Grado (GO)" }
+      - { label: Validità attestato, name: validity, widget: string, required: false, hint: "Es. 3 anni" }
+      - { label: Immagine, name: image, widget: image, required: false, hint: "Formato orizzontale 3:2, idealmente 1200×800 px in WebP o JPG." }
+      - { label: Descrizione breve, name: short, widget: markdown, required: false, hint: "Mostrata in alto nella scheda del corso." }
+      - { label: Descrizione completa, name: description, widget: markdown, required: false, hint: "Programma, destinatari, requisiti, certificazione…" }
+
+  # ------------------------------------------------------------------ prodotti
+  - name: prodotti
+    label: Prodotti shop
+    label_singular: Prodotto
+    folder: content/prodotti
+    extension: json
+    format: json
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    identifier_field: title
+    summary: "{{title}}"
+    sortable_fields: [title]
+    editor:
+      preview: false
+    fields:
+      - { label: Nome, name: title, widget: string }
+      - { label: Pubblicato, name: published, widget: boolean, default: true }
+      - label: Categoria
+        name: category
+        widget: select
+        options:
+          - { label: Cassette di pronto soccorso, value: cassette-pronto-soccorso }
+          - { label: Defibrillatori, value: defibrillatori }
+          - { label: Cartellonistica, value: cartellonistica }
+          - { label: Altri prodotti, value: altri-prodotti }
+      - { label: "Prezzo (€, IVA inclusa)", name: price, widget: number, value_type: float, min: 0, step: 0.01 }
+      - { label: "Spese di spedizione per unità (€)", name: shipping, widget: number, value_type: float, min: 0, step: 0.01, default: 15 }
+      - { label: Disponibile, name: in_stock, widget: boolean, default: true, hint: "Disattiva per mostrarlo come esaurito." }
+      - { label: Immagine principale, name: image, widget: image, hint: "Quadrata, sfondo bianco o trasparente." }
+      - { label: Altre immagini, name: gallery, widget: image, multiple: true, required: false }
+      - { label: Descrizione breve, name: short, widget: markdown, required: false }
+      - { label: Descrizione e contenuto, name: description, widget: markdown, required: false }
+
+  # ------------------------------------------------------------------ news
+  - name: news
+    label: News e aggiornamenti
+    label_singular: Articolo
+    folder: content/news
+    extension: json
+    format: json
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    identifier_field: title
+    summary: "{{title}} ({{date}})"
+    sortable_fields: [date, title]
+    editor:
+      preview: false
+    fields:
+      - { label: Titolo, name: title, widget: string }
+      - { label: Pubblicato, name: published, widget: boolean, default: true }
+      - { label: Data di pubblicazione, name: date, widget: datetime, time_format: false, date_format: "DD/MM/YYYY", format: "YYYY-MM-DD", default: "{{now}}" }
+      - { label: Immagine di copertina, name: image, widget: image, required: false, hint: "Formato orizzontale 3:2. Se manca viene usata la foto dell’aula." }
+      - { label: Documenti scaricabili, name: files, widget: file, multiple: true, required: false, hint: "PDF o altri file da scaricare (es. ordinanze, moduli)." }
+      - { label: Testo, name: body, widget: markdown, required: false }
+
+  # ------------------------------------------------------------------ categorie
+  - name: categorie
+    label: Categorie
+    label_singular: Categoria
+    description: Titolo e testo introduttivo delle pagine categoria. I corsi si assegnano alle categorie dalla scheda del corso.
+    folder: content/categorie
+    extension: json
+    format: json
+    create: false
+    delete: false
+    identifier_field: title
+    summary: "{{title}}"
+    editor:
+      preview: false
+    fields:
+      - { label: Titolo della pagina, name: title, widget: string }
+      - { label: Testo introduttivo, name: intro, widget: markdown, required: false }
+
+  # ------------------------------------------------------------------ pagine legali
+  - name: legali
+    label: Pagine legali
+    label_singular: Pagina legale
+    folder: content/legali
+    extension: json
+    format: json
+    create: false
+    delete: false
+    identifier_field: title
+    summary: "{{title}}"
+    editor:
+      preview: false
+    fields:
+      - { label: Titolo, name: title, widget: string }
+      - { label: Testo, name: body, widget: markdown }
+
+  # ------------------------------------------------------------------ impostazioni
+  - name: impostazioni
+    label: Impostazioni
+    editor:
+      preview: false
+    files:
+      - name: contatti
+        label: Contatti e dati aziendali
+        file: content/impostazioni/contatti.json
+        format: json
+        fields:
+          - { label: Ragione sociale, name: name, widget: string }
+          - { label: Indirizzo, name: address, widget: string }
+          - { label: CAP e città, name: city, widget: string }
+          - { label: P. IVA / C.F., name: piva, widget: string }
+          - { label: REA, name: rea, widget: string }
+          - { label: Capitale sociale, name: capitale, widget: string }
+          - label: Telefoni
+            name: phones
+            widget: list
+            summary: "{{label}}"
+            fields:
+              - { label: Numero da mostrare, name: label, widget: string, hint: "Es. 351 346 3697" }
+              - { label: Numero internazionale, name: number, widget: string, hint: "Es. +393513463697 (usato anche per WhatsApp)" }
+          - label: Email
+            name: emails
+            widget: list
+            summary: "{{email}}"
+            fields:
+              - { label: Reparto, name: label, widget: string }
+              - { label: Indirizzo email, name: email, widget: string }
+          - { label: Pagina Facebook, name: facebook, widget: string }
+          - { label: Profilo Instagram, name: instagram, widget: string }
+          - { label: Link Google Maps della sede, name: maps, widget: string }

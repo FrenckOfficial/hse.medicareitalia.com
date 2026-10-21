@@ -1,0 +1,31 @@
+{
+  "name": "Medicare Italia S.r.l.",
+  "address": "Viale Argine dei Moreri, 8",
+  "city": "34073 Grado (GO)",
+  "piva": "01273290310",
+  "rea": "REA GO-214174",
+  "capitale": "Cap. soc. € 10.000,00 i.v.",
+  "phones": [
+    {
+      "label": "351 346 3697",
+      "number": "+393513463697"
+    },
+    {
+      "label": "352 011 8120",
+      "number": "+393520118120"
+    }
+  ],
+  "emails": [
+    {
+      "label": "HSE, medicina del lavoro e RSPP",
+      "email": "rspp@medicareitalia.org"
+    },
+    {
+      "label": "Corsi e aggiornamento professionale",
+      "email": "formazione@medicareitalia.org"
+    }
+  ],
+  "facebook": "https://www.facebook.com/people/Medicare-Italia-Sicurezza-sul-Lavoro/61591903374701/",
+  "instagram": "https://www.instagram.com/medicare_italia_sicurezza/",
+  "maps": "https://www.google.com/maps/search/?api=1&query=Viale%20Argine%20dei%20Moreri%2C%208%2C%2034073%20Grado%20%28GO%29"
+}
